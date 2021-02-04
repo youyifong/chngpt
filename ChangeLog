@@ -1,0 +1,330 @@
+2013-05-25  
+    * create package
+
+2013-08-14  
+    * add set.seed(1) to chngpt.score.test so that the results are
+    reproducible
+    * rename chngpt.score.test to chngpt.test
+    * MASS is used for generating reference distribution samples while mvrnorm
+    is used in sim.sigmoid. In principle, should be able to use a single
+    package, but since the simulation studies for the paper has already been
+    run, just leave it as it is
+    * let search.all.thresholds be true if n < 500
+
+2015-09-01  
+    * when glm warns, set the log likelihood to NA
+
+2015-09-29  
+    * implement more vcov
+    * add e.effective.maxit to deal with non-convergence
+    
+2015-10-18  
+    * when est.method==smoothapprox, effective chgnpt needs to be determined
+    to stop infinite loops. It used to be defined in between two observed data
+    values, but is not set to one observed data value
+
+2015-11-19  
+    * make.chngpt.var now takes b. as an argument, the results of smoothapprox
+    estimation will change!
+
+2016-01-24  
+    * add testing for linear model
+
+2017-05-13  
+    * modify make.chngpt.var to fit smooth transition model
+    * add sandwich variance estimator
+    * add segmented2
+    * change b to -b
+
+2017-09-16  
+    * this version contains some commented out code related to indices, which
+    was used to compare with R implemention
+
+2017-10-27  
+    * a major cleanup of sim.chngpt
+    * weighted estimation now works
+
+2018-03-30  
+    * change how chngpts are defined in chngpt.test
+    * weighted estimation now works
+    * chngptm used to use chngpt.test to initialize when doing smooth
+    approximation. now chngptm uses chngptm to initialize in that situation.
+    This way chngptm does not depend on chngpt.test anymore
+
+2018-05-02  
+    * Add support for cbind() on the lhs for the binomial family. Both grid
+    and smoothapprox are supported.
+    * Add support for Poisson family
+    * Many thanks to Helen R. Sofaer for the questions resulting in the update
+
+2018-06-02
+    * Implement fastgrid for thinned thresholds. 
+    * Deprecate useC for grid search
+    * Revamp vignette
+    * Add approximate p value when var.method is bootstrap
+    * Change summary chngptm output to remove empirical percentile of the
+    estimated threshold
+
+2018-07-02
+    * Add chngptm.xy (x,y,...) to provide an alternative way of fitting
+    chngptm without data frame and formula
+
+2018-07-16
+    * Replace %+% by %.% throughout to work with the udpated kyotil package
+
+2018-07-25
+    * Change robust testing implementation
+    * RDR is changed to R.h %*% D.h when not robust. This requires a change of
+    values in the unit testing function
+
+2018-08-07
+    * Add upper hinge model implementation
+    * Remove smooth as a var.type, comment out var.est.smooth and remove
+    smooth from unit testing
+    * Implement superfastgrid
+    * Merge fastgrid_search and boot_fastgrid_search into one C function
+    * Implement grid search in C for upperhinge2
+
+2018-10-08
+    * A naive implementation of the test inversion CI is added when search method is grid
+
+2019-01-02  
+    * Michal Jurask reported a bug when the glm has a NA coef. Fix at line
+    897.
+
+2019-03-08
+    * Bug fix, delete to delete[]
+
+2019-03-12
+    * Bug fix, add   X.col(p-2) = (x-e)%(x>e); in fastgrid_binomial.cpp
+
+2019-04
+    * Fix vcov implementation when var.type is bootstrap
+    * Add multicore parallel support for bootstrap. ncpus controls the number of cores. Thanks to JDS for the question resulting in the update
+
+2019-04-21
+    * Discovered that adding support for thinned thresholds back in 2018-10-2
+    (compared to 2018-10-1) slows things down by two fold. Fixed it.
+
+2019-06-17
+    * This version has an unsuccesful attempt to add upper hinge quadratic
+    model   
+
+2019-06-17
+    * Revert back to before 6.17
+
+2019-06-30
+    * Revert back to 6.17 and work from there
+    * Change the implementation of upperhingequad in chngptm from based on formula.2 to type
+
+2019-07-23
+    * Bug fix in SEXP fastgrid2quad_gaussian so that bootstrap for upperhingequad works too
+
+2019-08-16
+    * Allow subsampling bootstrap m-out-of-n for discontinuous threshold effects in chngptm(). Thanks to Jeremy Nguyen for the question resulting in the update
+
+2019-08-17
+    * Allow more than one variables to be interacting with the threshold variable. chngptm updated, unit testing code added. A quick test for consistency performed (test_multi_itxn.R). Thanks to Jeremy Nguyen for the question resulting in the update
+
+2019-08-26
+    * chngpt.test throws an exception. Modify chngpt.test() to check if the min and max are part of the candidate change points and if yes, remove them. Thanks to Eric Scott for the question resulting in the update
+    * Add CXX_STD = CXX11 to Makevars and Makevars.win. Replace ptr_fun by cref in smath.h. Thanks Prof Brian Ripley
+    * Change ncpus default to 1 to avoid an error on debian
+
+2019-08-28
+    * Remove fastgrid_binomial_wrapper.cpp and fastgrid_binomial.cpp for now. They lead to check errors on CRAN. Namespace and description file also changed accordingly
+    * Vignette updated
+
+2019-09-02
+    * Replace bind1st and bind2nd by bind in matrix.h and smath.h in the scythe library. Thanks Prof Brian Ripley
+
+2019-09-05
+    * Add estimation and CI for hingequad model
+    * Vignette updated
+    * Add LIDAR data (lidar)
+
+2019-09-15
+    * add argument checking for weights
+    * add support for offset to chngptm and plot.chngptm
+    * Thanks to Ryan Terrill for the questions resulting in the updates
+
+2019-09-19
+    * add support for offset in fastgrid2 
+    * implement double.hinge
+
+2019-10-04
+    * implement segmented quadratic models: M1, M2, M3a, and M3b in chngptm
+    
+2019-10-15
+    * change how the step effect is implemented in make.chngpt.var(), from I(x>=e) to I(x>e) to be consistent with Fong et al. (2017)
+    * implement fastgrid2 for step
+
+2019-10-17
+    * fix a bug in chngptm relate to hingequad.to.upperhingequad, which causes the lower and upper CI bounds for some models to be reversed
+
+2019-10-29
+    * implement upper hinge and hinge cubic model
+
+2019-11-09
+    * implement segmented cubic models
+
+2019-11-13
+    * implement x4hinge and x4upperhinge models to fit LIDAR example, but grid search only
+
+2019-11-16
+    * rename the higher order models
+
+2019-11-18
+    * remove isupperhinge parameter and related implementations from all C functions. all c functions only implement upperhinge and related models. All hinge and related models are implemented through transformation
+
+2019-11-21
+    * add support for subsampling, aka m out of n bootstrap, in fastgrid2step_gaussian
+
+2019-11-22
+    * change grid.search.max default in chgnptm from 5e3 to Inf
+    * remove fastgrid and gridC from est.method options
+    * add support for weight in fastgrid2
+    * replace invpd with chol_solve in the C functions, the former gives weird results sometimes. See M20.cc for an example. 
+    * refactor C code
+
+2019-11-26
+    * fix a memory issue from inverting a 0-column matrix when the design matrix has 0 columns
+
+2019-11-30
+    * Add a check in get.chngpts() so that we do not have the min to be the first change point
+    * Change direct assignment to indirect copy in _preprocess (fastgrid_helper.cc)
+
+2019-12-4
+    * Add a new argument, min.max.not.allowed, in get.chngpts(), default to FALSE, but in chngpt.test, set it to TRUE
+    * revamp double.hinge so that there is no need to supply mid.x
+
+2019-12-6
+    * Add summary function for double.hinge to faciliate hypothesis testing
+
+2019-12-7
+    * Add predictx for confidence bands
+
+2019-12-13
+    * Change paramterization of M22c and M33c. Remove x.mi.e
+    * Change M10 back to upperhinge
+
+2019-12-31
+    * Add x.gt.e[is.nan(x.gt.e)]=0 in sim.chngpt
+
+2020-01-02
+    * Fix name.conversion for M22c and M33c
+    * Add nutrition dataset
+
+2020-01-09
+    * Implement M21c and M12c
+    * Implement plot.double.hinge
+
+2020-01-20
+    * Add intercept to predictions in threshold.func()
+    * Add boot.type argument to summary.chngptm
+    * Make changes to chngptm so that it will work when bootstrap logistic regression with factor predictors of many levels. 
+      The problem was that bootstrap datasets may not have all the levels
+
+2020-02-11
+    * Modify name.conversion.2() to change intercept to (Intercept) in coef.0
+    * Modify convert.coef to add M21c
+    * Fix a bug that lead to errors in basic bootstrap intervals when hinge.to.upperhinge is TRUE
+
+2020-02-17
+    * Add heteroscedastic argument to sim.chngpt
+
+2020-02-20
+    * Add unif argument to sim.chngpt
+
+2020-02-22
+    * Modify convert.coef() to include adjustment of intercept
+    * Modify plot.chngptm() so that it works properly for step model
+    * Add * next to p value in summary.chngptm print out to indicate that it is not a true p value
+
+2020-04-27
+    * Modify chngptm() and fastgrid2.cc to include adjustment of intercept
+
+2020-05-13
+    * Update vignette
+
+2020-05-21
+    * Remove std:terminate at request of BDR
+
+2020-05-24
+    * Allow random intercepts
+
+2020-06-05
+    * For threshold lmer models, select threshold based on logLik
+    * Allow individual lines to be plotted based on threshold lmer model fit
+
+2020-06-11
+    * Add logistic.slope to sim.chngpt
+
+2020-06-13
+    * Change to if(b.transition==Inf) transition[is.nan(transition)]=1 to see if it makes any difference for convergence rate
+
+2020-06-14
+    * Change back to if(b.transition==Inf) transition[is.nan(transition)]=0
+
+2020-06-24
+    * Fix implementation for stratified model
+    * Implement M111, three phase segmented model
+    * Add sim.twophase.ran.inte; add unit testing code for random intercept threshold models
+
+2020-06-25
+    * Add plot functionality for M111
+    * Fix ub.quantile and lb.quantile issue for M12c
+    * Add M111 to vignette
+
+2020-06-26
+    * Fix plot.chngpt for three-phase models 
+    * Change default bootstrap CI type from symm to perc in summary.chngpt
+    
+2020-07-01
+    * Add logLik.chngptm
+    * Add examples of lrtest and lincomb to chngptm man and to vignette
+    * Add random intercept model to vignette
+    * Improve vignette
+
+2020-08-06
+    * M111_search: Add a hack to get around openblas problem for collinear matrix inversion 
+
+2020-08-10
+    * M111_search: Use a different implementation of matrix inversion that does not depend on blas
+
+2020-08-10
+    * M111_search: Use an alternative way to compute crit that is more numerically stable when highly collinear
+    * M111_search: bootstrap may have duplicate threshold candidates, which could cause problems. this is now taken care of
+    * M111_search: Removing the hack of skipping if crit 20 percent larger than the previous since it does not work for small datasets
+    * fixed a bug related to REML
+
+2020-08-28
+    * Add extractAIC, AIC
+
+2020-08-29
+    * Make examples run faster by reducing ci.bootstrap.size
+
+2020-09-16
+    * M111_search: add fabs to the condition for duplicate thresholds, modify the check for duplicated thresholds
+
+2020-09-17
+    * add sieve bootstrap 
+
+2020-09-28
+    * add awb bootstrap 
+
+2020-10-6
+    * fix getFixedEf.chngptm
+    * improve summary.chngptm
+
+2020-10-12
+    * fix a bug related to sieveBoot in fastgrid2.cc
+
+2020-10-19
+    * fix summary.chngptm to get show.slope.post.threshold to work again
+
+2020-10-25
+    * fix chngptm to replace logLik with deviance for quasipoisson fits
+
+2020-12-17
+    * fix documentation
