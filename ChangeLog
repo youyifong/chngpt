@@ -328,3 +328,6 @@
 
 2020-12-17
     * fix documentation
+
+2020-2-4
+    * add y.adj=NULL, auto.adj.y=FALSE to plot.chngptm so that the fitted lines can be adjusted to go through the data points

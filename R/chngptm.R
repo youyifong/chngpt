@@ -1615,7 +1615,7 @@ logLik.chngptm=function(object,...) {
 }
 
 # which=1: scatterplot with fitted line, only works for simple regression
-plot.chngptm=function(x, which=NULL, xlim=NULL, lwd=2, lcol="red", lty=1, add=FALSE, add.points=TRUE, add.ci=TRUE, breaks=20, mark.chngpt=TRUE, xlab=NULL, ylab=NULL, plot.individual.line=FALSE, main="", ...) {
+plot.chngptm=function(x, which=NULL, xlim=NULL, lwd=2, lcol="red", lty=1, add=FALSE, add.points=TRUE, add.ci=TRUE, breaks=20, mark.chngpt=TRUE, xlab=NULL, ylab=NULL, plot.individual.line=FALSE, main="", y.adj=NULL, auto.adj.y=FALSE, ...) {
     
     has.boot.samples=FALSE
     if(is.list(x$vcov)) if(!is.null(x$vcov$boot.samples)) has.boot.samples=TRUE 
@@ -1625,7 +1625,7 @@ plot.chngptm=function(x, which=NULL, xlim=NULL, lwd=2, lcol="red", lty=1, add=FA
     
     if(is.null(which)) {
         par(mfrow=c(1+has.submodel.lik+has.boot.samples,1))
-                              plot(x,1,xlim=xlim,lwd=lwd,lcol=lcol,mark.chngpt=mark.chngpt,...)
+                              plot(x,1,xlim=xlim,lwd=lwd,lcol=lcol,mark.chngpt=mark.chngpt,y.adj=y.adj, auto.adj.y=auto.adj.y,...)
         if (has.submodel.lik) plot(x,2,xlim=xlim,lwd=lwd,lcol=lcol,...)
         if (has.boot.samples) plot(x,3,xlim=xlim,lwd=lwd,lcol=lcol,...)
         return(invisible())
@@ -1676,13 +1676,21 @@ plot.chngptm=function(x, which=NULL, xlim=NULL, lwd=2, lcol="red", lty=1, add=FA
                 xx=seq(xlim[1],chngpt.est[1],length=100)
                 yy = offset + intercept + slope*xx + pre.e*(xx-chngpt.est[1]) + pre.f*(xx-chngpt.est[2])
                 yy=linkinv(yy)
+                
+                # may need to adjust y if there are other covariates
+                if(auto.adj.y) {
+                    y.adj=median(y)-last(yy)
+                } else if(is.null(y.adj)) y.adj=0
+                
+                yy=yy+y.adj
+                
                 out[[1]]=cbind(xx,yy)
                 lines(xx, yy, lwd=lwd, col=lcol, lty=lty)
                 #str(xx); str(yy); str(chngpt.est); str(pre.slope); str(intercept); str(linkinv)
                 
                 xx=seq(chngpt.est[1], chngpt.est[2], length=100)
                 yy = offset + intercept + slope*xx + pre.f*(xx-chngpt.est[2])
-                yy=linkinv(yy)
+                yy=linkinv(yy)+y.adj
                 out[[1]]=rbind(out[[1]], cbind(xx,yy))
                 lines(xx, yy, lwd=lwd, col=lcol, lty=lty)
     
@@ -1690,7 +1698,7 @@ plot.chngptm=function(x, which=NULL, xlim=NULL, lwd=2, lcol="red", lty=1, add=FA
                
                 xx=seq(chngpt.est[2], xlim[2], length=100)
                 yy = offset + intercept + slope*xx
-                yy=linkinv(yy)
+                yy=linkinv(yy)+y.adj
                 out[[1]]=rbind(out[[1]], cbind(xx,yy))
                 lines(xx, yy, lwd=lwd, col=lcol, lty=lty)
                 
@@ -1721,6 +1729,14 @@ plot.chngptm=function(x, which=NULL, xlim=NULL, lwd=2, lcol="red", lty=1, add=FA
                 xx=seq(xlim[1],chngpt.est,length=100)
                 yy = offset + intercept + slope*xx + (pre.slope)*(xx-chngpt.est) + (pre.slope.2+M6bquad)*(xx-chngpt.est)^2 + pre.slope.3*(xx-chngpt.est)^3  + pre.slope.4*(xx-chngpt.est)^4 
                 yy=linkinv(yy)
+                
+                # may need to adjust y if there are other covariates
+                if(auto.adj.y) {
+                    y.adj=median(y)-last(yy)
+                } else if(is.null(y.adj)) y.adj=0
+                
+                yy=yy+y.adj
+                
                 out[[1]]=cbind(xx,yy)
                 lines(xx, yy, lwd=lwd, col=lcol, lty=lty)
                 #str(xx); str(yy); str(chngpt.est); str(pre.slope); str(intercept); str(linkinv)
@@ -1728,7 +1744,7 @@ plot.chngptm=function(x, which=NULL, xlim=NULL, lwd=2, lcol="red", lty=1, add=FA
                 # post
                 xx=seq(chngpt.est, xlim[2], length=100)
                 yy = offset + intercept + slope*xx + (post.slope)*(xx-chngpt.est) + (post.slope.2+M6bquad)*(xx-chngpt.est)^2 + post.slope.3*(xx-chngpt.est)^3 + post.slope.4*(xx-chngpt.est)^4 + post.jump
-                yy=linkinv(yy)
+                yy=linkinv(yy)+y.adj
                 out[[1]]=rbind(out[[1]], cbind(xx,yy))
                 lines(xx, yy, lwd=lwd, col=lcol, lty=lty)
         

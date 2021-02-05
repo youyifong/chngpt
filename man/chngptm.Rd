@@ -56,6 +56,7 @@ chngptm.xy(x, y, type=c("step","hinge","segmented","segmented2","stegmented"),
  lty = 1, add = FALSE, add.points = TRUE, add.ci =
  TRUE, breaks = 20, mark.chngpt = TRUE, xlab = NULL,
  ylab = NULL, plot.individual.line = FALSE, main = "",
+ y.adj=NULL, auto.adj.y=FALSE, 
  ...) 
 \method{summary}{chngptm} (object, var.type = NULL, expo = FALSE,
  show.slope.post.threshold = FALSE, verbose = FALSE,
@@ -111,6 +112,8 @@ lincomb(object, comb, alpha = 0.05, boot.type = "perc")
   \item{boot.test.inv.ci}{whether to get test inversion CI under bootstrap}
   \item{search.bound}{bounds for search for sloping parameters}
   \item{which}{an integer}
+  \item{y.adj}{}
+  \item{auto.adj.y}{}
   \item{xlim}{xlim}
   \item{lwd}{lwd}
   \item{lcol}{line col}
