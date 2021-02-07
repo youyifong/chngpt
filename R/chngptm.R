@@ -1750,7 +1750,7 @@ plot.chngptm=function(x, which=NULL, xlim=NULL, lwd=2, lcol="red", lty=1, add=FA
             } # end twophase
         }# end for intercept
     
-        if(!add) plot(data[[fit$chngpt.var]], y, xlim=xlim, xlab=ifelse(is.null(xlab),fit$chngpt.var,xlab), ylab=ifelse(is.null(ylab),yname,ylab), type="n", main=main, ..., ylim=range(out[[1]][,2]))
+        if(!add) plot(data[[fit$chngpt.var]], y, xlim=xlim, xlab=ifelse(is.null(xlab),fit$chngpt.var,xlab), ylab=ifelse(is.null(ylab),yname,ylab), type="n", main=main, ..., ylim=range(out[[1]][,2], if(add.points) y))
         if(add.points) points(data[[fit$chngpt.var]], y, ...)
         lines(out[[1]][,1], out[[1]][,2], lwd=lwd, col=lcol, lty=lty)
         #if(mark.chngpt) points(chngpt.est, yy[1], pch=19, col=lcol, cex=1.5)
