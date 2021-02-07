@@ -1615,7 +1615,8 @@ logLik.chngptm=function(object,...) {
 }
 
 # which=1: scatterplot with fitted line, only works for simple regression
-plot.chngptm=function(x, which=NULL, xlim=NULL, lwd=2, lcol="red", lty=1, add=FALSE, add.points=TRUE, add.ci=TRUE, breaks=20, mark.chngpt=TRUE, xlab=NULL, ylab=NULL, plot.individual.line=FALSE, main="", y.adj=NULL, auto.adj.y=FALSE, ...) {
+plot.chngptm=function(x, which=NULL, xlim=NULL, lwd=2, lcol="red", lty=1, add=FALSE, add.points=TRUE, add.ci=TRUE, breaks=20, mark.chngpt=TRUE, xlab=NULL, ylab=NULL, 
+    plot.individual.line=FALSE, main="", y.adj=NULL, auto.adj.y=FALSE, transform=NULL, ...) {
     
     has.boot.samples=FALSE
     if(is.list(x$vcov)) if(!is.null(x$vcov$boot.samples)) has.boot.samples=TRUE 
@@ -1632,7 +1633,7 @@ plot.chngptm=function(x, which=NULL, xlim=NULL, lwd=2, lcol="red", lty=1, add=FA
     }    
     
     fit=x
-    linkinv=get(fit$family)()$linkinv
+    linkinv=if (is.null(transform)) get(fit$family)()$linkinv else transform
     
     has.re="lmerMod" %in% class(fit$best.fit)
     
@@ -1653,11 +1654,9 @@ plot.chngptm=function(x, which=NULL, xlim=NULL, lwd=2, lcol="red", lty=1, add=FA
     if(is.null(xlim)) xlim=range(data[[fit$chngpt.var]])
         
     out=list()
+    out[[1]]=NULL
     if(which==1) {
     # scatterplot with lines
-        if(!add) plot(data[[fit$chngpt.var]], y, xlim=xlim, xlab=ifelse(is.null(xlab),fit$chngpt.var,xlab), ylab=ifelse(is.null(ylab),yname,ylab), type="n", main=main, ...)
-        # add points 
-        if(add.points) points(data[[fit$chngpt.var]], y, ...)
         chngpt.est=fit$chngpt        
         
         # random effect intercepts
@@ -1684,15 +1683,15 @@ plot.chngptm=function(x, which=NULL, xlim=NULL, lwd=2, lcol="red", lty=1, add=FA
                 
                 yy=yy+y.adj
                 
-                out[[1]]=cbind(xx,yy)
-                lines(xx, yy, lwd=lwd, col=lcol, lty=lty)
+                out[[1]]=rbind(out[[1]], cbind(xx,yy))
+#                lines(xx, yy, lwd=lwd, col=lcol, lty=lty)
                 #str(xx); str(yy); str(chngpt.est); str(pre.slope); str(intercept); str(linkinv)
                 
                 xx=seq(chngpt.est[1], chngpt.est[2], length=100)
                 yy = offset + intercept + slope*xx + pre.f*(xx-chngpt.est[2])
                 yy=linkinv(yy)+y.adj
                 out[[1]]=rbind(out[[1]], cbind(xx,yy))
-                lines(xx, yy, lwd=lwd, col=lcol, lty=lty)
+#                lines(xx, yy, lwd=lwd, col=lcol, lty=lty)
     
                 if(mark.chngpt) points(chngpt.est, yy[c(1,length(yy))], pch=19, col=lcol, cex=1.5)
                
@@ -1700,7 +1699,7 @@ plot.chngptm=function(x, which=NULL, xlim=NULL, lwd=2, lcol="red", lty=1, add=FA
                 yy = offset + intercept + slope*xx
                 yy=linkinv(yy)+y.adj
                 out[[1]]=rbind(out[[1]], cbind(xx,yy))
-                lines(xx, yy, lwd=lwd, col=lcol, lty=lty)
+#                lines(xx, yy, lwd=lwd, col=lcol, lty=lty)
                 
             } else {
                 # two phase
@@ -1738,7 +1737,7 @@ plot.chngptm=function(x, which=NULL, xlim=NULL, lwd=2, lcol="red", lty=1, add=FA
                 yy=yy+y.adj
                 
                 out[[1]]=cbind(xx,yy)
-                lines(xx, yy, lwd=lwd, col=lcol, lty=lty)
+#                lines(xx, yy, lwd=lwd, col=lcol, lty=lty)
                 #str(xx); str(yy); str(chngpt.est); str(pre.slope); str(intercept); str(linkinv)
                 
                 # post
@@ -1746,12 +1745,16 @@ plot.chngptm=function(x, which=NULL, xlim=NULL, lwd=2, lcol="red", lty=1, add=FA
                 yy = offset + intercept + slope*xx + (post.slope)*(xx-chngpt.est) + (post.slope.2+M6bquad)*(xx-chngpt.est)^2 + post.slope.3*(xx-chngpt.est)^3 + post.slope.4*(xx-chngpt.est)^4 + post.jump
                 yy=linkinv(yy)+y.adj
                 out[[1]]=rbind(out[[1]], cbind(xx,yy))
-                lines(xx, yy, lwd=lwd, col=lcol, lty=lty)
+#                lines(xx, yy, lwd=lwd, col=lcol, lty=lty)
         
-                if(mark.chngpt) points(chngpt.est, yy[1], pch=19, col=lcol, cex=1.5)
             } # end twophase
         }# end for intercept
     
+        if(!add) plot(data[[fit$chngpt.var]], y, xlim=xlim, xlab=ifelse(is.null(xlab),fit$chngpt.var,xlab), ylab=ifelse(is.null(ylab),yname,ylab), type="n", main=main, ..., ylim=range(out[[1]][,2]))
+        if(add.points) points(data[[fit$chngpt.var]], y, ...)
+        lines(out[[1]][,1], out[[1]][,2], lwd=lwd, col=lcol, lty=lty)
+        #if(mark.chngpt) points(chngpt.est, yy[1], pch=19, col=lcol, cex=1.5)
+
         #myprint(chngpt.est, yy[1])
         #myprint(mark.chngpt)
         
