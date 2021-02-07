@@ -12,7 +12,7 @@ Authors@R: c(person("Youyi", "Fong", role = "cre", email = "youyifong@gmail.com"
     person("Zonglin", "He", role = "aut", email = "nkhezl@gmail.com"), 
     person("Simone", "Giannerini", role = "aut", email = "simone.giannerini@unibo.it")
     )
-Depends: R (>= 4.0)
+Depends: R (>= 3.6)
 Suggests: R.rsp, RUnit, mvtnorm
 Imports: survival, splines, kyotil, boot, MASS, methods, lme4
 VignetteBuilder: R.rsp
