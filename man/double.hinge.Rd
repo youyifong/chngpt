@@ -13,7 +13,8 @@ Fit double hinge models.
 \usage{
 double.hinge(x, y, lower.y = NULL, upper.y = NULL,
          var.type = c("none", "bootstrap"), ci.bootstrap.size =
-         1000, alpha = 0.05, save.boot = TRUE, ncpus = 1)
+         1000, alpha = 0.05, save.boot = TRUE, ncpus = 1, 
+         boot.ci.type=c("percentile","symmetric"))
 
 \method{plot}{double.hinge} (x, which = NULL, xlim = NULL, 
  lwd = 2, lcol = "red",
@@ -40,6 +41,9 @@ double.hinge(x, y, lower.y = NULL, upper.y = NULL,
 %%     ~~Describe \code{upper.y} here~~
 }
   \item{var.type}{
+%%     ~~Describe \code{var.type} here~~
+}
+  \item{boot.ci.type}{
 %%     ~~Describe \code{var.type} here~~
 }
   \item{ci.bootstrap.size}{

@@ -334,3 +334,6 @@
 
 2020-2-7
     * add transform to plot.chngpt
+
+2020-2-9
+    * add boot.ci.type to double.hinge
