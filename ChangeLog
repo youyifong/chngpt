@@ -337,3 +337,4 @@
 
 2020-2-9
     * add boot.ci.type to double.hinge
+    * update kyotil dependency with version number
