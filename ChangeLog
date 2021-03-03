@@ -338,3 +338,6 @@
 2020-2-9
     * add boot.ci.type to double.hinge
     * update kyotil dependency with version number
+
+2020-3-3
+    * update chngptm to exit more gracefully when fastgrid fails due to singularity
