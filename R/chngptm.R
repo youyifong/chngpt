@@ -29,12 +29,12 @@ chngptm = function(formula.1, formula.2, family, data,
   
 {   
     if (missing(type)) stop("type missing")    
-    threshold.type<-match.arg(type)  # change name from type to threshold.type
+    type<-match.arg(type)  # change name from type to threshold.type
     var.type<-match.arg(var.type)    
     est.method<-match.arg(est.method)    
     bootstrap.type<-match.arg(bootstrap.type)    
     
-
+    threshold.type=type
     if (est.method=="fastgrid") est.method="fastgrid2" # keep fastgrid only for backward compatibility
     if(threshold.type=="M01") threshold.type="hinge"
     if(threshold.type=="M10") threshold.type="upperhinge"
@@ -351,6 +351,9 @@ chngptm = function(formula.1, formula.2, family, data,
                     , 0 # false
                     , 0 # sieve.dat
                 )  
+                # fastgrid is more sensitive to singularity of design matrix (A <- solve(t(desg) %*% desg) can lead to trouble)
+                # the following check handles this exception more gracefully
+                if(all(is.nan(logliks))) stop("fastgrid fails, probably due to singularity")
                 #print(logliks)
             } else {
                 #cbind(chngpt.var.sorted*c(rep.int(0,n.0),rep.int(1,n.1)), chngpt.var.sorted*c(rep.int(1,n.0),rep.int(0,n.1))), # added col
