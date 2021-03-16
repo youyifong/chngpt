@@ -61,7 +61,7 @@ dat = sim.chngpt(mean.model="thresholded", threshold.type=type, n=200, seed=1, b
 attr(dat,"coef")
 plot(y~x, dat)
 fit = chngptm (formula.1=y~z, formula.2=~x, family="gaussian", dat,  type=type, est.method="fastgrid2", var.type="bootstrap", ci.bootstrap.size=100, verbose=verbose)
-#fit; plot(fit)
+if(verbose) plot(fit); fit
 checkEqualsNumeric(coef(fit), c(-0.6677877,0.8992538,2.2789307,1.9569163), tolerance=tolerance)    
 est=lincomb(fit, comb=c(0,0,1,1), alpha=0.05); print(est)
 
@@ -197,6 +197,28 @@ for (type in c("segmented","hinge","upperhinge")) {
 print("########  M02 and M20")
 for (type in c("M20","M02")) {
     dat=sim.chngpt(mean.model="thresholded", threshold.type=type, n=250, seed=1, beta=if(type=="M20") c(32,2) else c(10,10), x.distr="norm", e.=6, b.transition=Inf, family="gaussian", alpha=0)
+    if (verbose) plot(y~x, dat)
+    est.methods=c("fastgrid2","grid")
+    out=NULL
+    for (est.method in est.methods) {
+        fit.0=chngptm (formula.1=y~z, formula.2=~x, family="gaussian", dat, type=type, est.method=est.method, var.type="none", save.boot=T, ci.bootstrap.size=1, verbose=verbose, weights=rep(c(1,5),each=nrow(dat)/2))
+        if(verbose) plot(fit.0); fit.0
+        out=cbind(out, c(
+          fit.0$logliks[1],
+          diff(fit.0$logliks)[1:3],
+          fit.0$coefficients,
+          fit.0$vcov$boot.samples[1,]
+        ))
+    }
+    colnames(out)=est.methods
+    if(verbose) print(out)
+    for (m in est.methods) checkEqualsNumeric(out[,"grid"], out[,m], tolerance=tolerance)    
+}
+
+
+print("########  M12")
+for (type in c("M12")) {
+    dat=sim.chngpt(mean.model="thresholded", threshold.type=type, n=250, seed=1, beta=c(10,10,20), x.distr="norm", e.=6, b.transition=Inf, family="gaussian", alpha=0)
     if (verbose) plot(y~x, dat)
     est.methods=c("fastgrid2","grid")
     out=NULL

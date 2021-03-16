@@ -663,7 +663,7 @@ chngptm = function(formula.1, formula.2, family, data,
             coef.hat["chngpt.0"]=-coef.hat["chngpt.0"]
             coef.hat["chngpt.1"]=-coef.hat["chngpt.1"]
         }
-#        tmp=chngpt.var.name;                           if(!is.na(coef.hat[tmp])) coef.hat[tmp]=-coef.hat[tmp]
+        tmp=chngpt.var.name;                           if(!is.na(coef.hat[tmp])) coef.hat[tmp]=-coef.hat[tmp]
         tmp=paste0("(",chngpt.var.name,"-chngpt)+");   if(!is.na(coef.hat[tmp])) coef.hat[tmp]=-coef.hat[tmp]
         tmp=paste0("(",chngpt.var.name,"-chngpt)+^3"); if(!is.na(coef.hat[tmp])) coef.hat[tmp]=-coef.hat[tmp]
     }
@@ -1685,9 +1685,8 @@ plot.chngptm=function(x, which=NULL, xlim=NULL, lwd=2, lcol="red", lty=1, add=FA
                 } else if(is.null(y.adj)) y.adj=0
                 
                 yy=yy+y.adj
-                
-                out[[1]]=rbind(out[[1]], cbind(xx,yy))
-#                lines(xx, yy, lwd=lwd, col=lcol, lty=lty)
+                out[[1]]=cbind(xx,yy)
+                #lines(xx, yy, lwd=lwd, col=lcol, lty=lty)
                 #str(xx); str(yy); str(chngpt.est); str(pre.slope); str(intercept); str(linkinv)
                 
                 xx=seq(chngpt.est[1], chngpt.est[2], length=100)
@@ -1696,7 +1695,7 @@ plot.chngptm=function(x, which=NULL, xlim=NULL, lwd=2, lcol="red", lty=1, add=FA
                 out[[1]]=rbind(out[[1]], cbind(xx,yy))
 #                lines(xx, yy, lwd=lwd, col=lcol, lty=lty)
     
-                if(mark.chngpt) points(chngpt.est, yy[c(1,length(yy))], pch=19, col=lcol, cex=1.5)
+                #if(mark.chngpt) points(chngpt.est, yy[c(1,length(yy))], pch=19, col=lcol, cex=1.5)
                
                 xx=seq(chngpt.est[2], xlim[2], length=100)
                 yy = offset + intercept + slope*xx
