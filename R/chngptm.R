@@ -13,7 +13,7 @@ chngptm = function(formula.1, formula.2, family, data,
   # estimation
   est.method=c("default","fastgrid2","fastgrid","grid","smoothapprox"), 
   var.type=c("default","none","robust","model","bootstrap","all"), aux.fit=NULL,  # robusttruth is for development only
-  lb.quantile=.1, ub.quantile=.9, grid.search.max=Inf,# chngpts=NULL,
+  lb.quantile=.05, ub.quantile=.95, grid.search.max=Inf,# chngpts=NULL,
   test.inv.ci=TRUE, boot.test.inv.ci=FALSE, # test.inv.ci is passed to local functions, boot.test.inv.ci is global within this function
   # bootstrap arguments
   bootstrap.type=c("nonparametric","wild","sieve","wildsieve","awb"), 

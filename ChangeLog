@@ -343,5 +343,7 @@
     * update chngptm to exit more gracefully when fastgrid fails due to singularity
 
 2020-3-16
-	* fix chngptm so that coef for M12 is not messed by due to
-	hinge.to.upperhinge (line 666)
+    * fix chngptm so that coef for M12 is not messed by due to hinge.to.upperhinge (line 666)
+
+2020-3-17
+    * change ub.quantile/lb.quantile from 90/10 to 95/5 percentile in chngptm
