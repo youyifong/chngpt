@@ -347,3 +347,6 @@
 
 2020-3-17
     * change ub.quantile/lb.quantile from 90/10 to 95/5 percentile in chngptm
+
+2020-3-30
+    * fix a typo in threshold.func related to step model

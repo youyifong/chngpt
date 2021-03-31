@@ -2245,7 +2245,7 @@ threshold.func=function(threshold.type, coef, xx, x.name, include.intercept=FALS
   , M31       = ifelse(include.intercept,get("(Intercept)"),0) + xx*get(x.name) + get("("%.%x.name%.%"-chngpt)-")*(xx<chngpt)*(xx-chngpt) + get("("%.%x.name%.%"-chngpt)-^2")*(xx<chngpt)*(xx-chngpt)^2 + get("("%.%x.name%.%"-chngpt)-^3")*(xx<chngpt)*(xx-chngpt)^3
   , M13       = ifelse(include.intercept,get("(Intercept)"),0) + xx*get(x.name) + get("("%.%x.name%.%"-chngpt)+")*(xx>chngpt)*(xx-chngpt) + get("("%.%x.name%.%"-chngpt)+^2")*(xx>chngpt)*(xx-chngpt)^2 + get("("%.%x.name%.%"-chngpt)+^3")*(xx>chngpt)*(xx-chngpt)^3
   , M33c      = ifelse(include.intercept,get("(Intercept)"),0) + xx*get(x.name) +                                                           get("("%.%x.name%.%"-chngpt)^2")*(xx-chngpt)^2 + get("("%.%x.name%.%"-chngpt)+^3")*(xx>chngpt)*(xx-chngpt)^3 + get("("%.%x.name%.%"-chngpt)-^3")*(xx<chngpt)*(xx-chngpt)^3 
-  , step      = ifelse(include.intercept,get("(Intercept)"),0) +                  get(""%.%x.name%.%">chngpt)")  *(xx>chngpt)
+  , step      = ifelse(include.intercept,get("(Intercept)"),0) +                  get(""%.%x.name%.%">chngpt")  *(xx>chngpt)
   ))
 }
 
