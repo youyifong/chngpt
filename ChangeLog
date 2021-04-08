@@ -350,3 +350,7 @@
 
 2020-3-30
     * fix a typo in threshold.func related to step model
+
+2020-4-7
+    * Add M111 to threshold.func()
+    * Support parallel processing in fastgrid

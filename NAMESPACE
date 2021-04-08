@@ -5,7 +5,9 @@ export(sim.threephase, sim.twophase.ran.inte, sim.pastor, sim.my, sim.chngpt, li
 
 importFrom("methods", "hasArg")
 importFrom(kyotil, '%.%', rbern, expit, keepWarnings, myprint, concatList, mysapply, "tXDX", "interpolate", "last", getFixedEf, abline.pt.slope, contain, empty.plot, rnorm.ar)
+importFrom(parallel, mclapply)
 importFrom(MASS, mvrnorm)
+importFrom(RhpcBLASctl, blas_get_num_procs, blas_set_num_threads)
 importFrom(lme4, nobars, lmer, fixef)
 import(survival)
 importFrom("graphics", "abline", "plot", "axis", "lines", "par", "points", "hist")

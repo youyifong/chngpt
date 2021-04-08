@@ -34,6 +34,14 @@ chngptm = function(formula.1, formula.2, family, data,
     est.method<-match.arg(est.method)    
     bootstrap.type<-match.arg(bootstrap.type)    
     
+    library(RhpcBLASctl)
+    # without this, code may hang when ncpus>1
+    blas_get_num_procs()
+    blas_set_num_threads(1)
+    stopifnot(blas_get_num_procs()==1)
+    
+    if (var.type=="bootstrap" & ci.bootstrap.size %% ncpus != 0) stop("ci.bootstrap.size needs to be a multiple of ncpus")
+    
     threshold.type=type
     if (est.method=="fastgrid") est.method="fastgrid2" # keep fastgrid only for backward compatibility
     if(threshold.type=="M01") threshold.type="hinge"
@@ -681,18 +689,23 @@ chngptm = function(formula.1, formula.2, family, data,
     
         ci.bootstrap=function(){
             if(verbose>1) cat("\nin ci.bootstrap\n")            
+            
             # save rng state before set.seed in order to restore before exiting this function
             save.seed <- try(get(".Random.seed", .GlobalEnv), silent=TRUE) 
             if (class(save.seed)=="try-error") {set.seed(1); save.seed <- get(".Random.seed", .GlobalEnv) }      
-            set.seed(1)     # this is only added on 7/30/2017, well after biometrics paper is published. should not change the results qualitatively
             
             if (fastgrid.ok & est.method%in%c("fastgrid","fastgrid2","gridC")) {
-            # fastgrid
                 if (bootstrap.type=="nonparametric") {
                     sieve.y=NULL
                 } else {
                     # the functions surrogate.AR, awb, etc are defined at the end of this file
                     # this assumes that the ordering of observations is based on the chngpt variable
+                    
+                    # because sieve.y is a matrix of ci.bootstrap.size columns, we have to do this
+                    if(ncpus>1) stop("when bootstrap.type is not nonparametric, ncpus has to be set to 1 for now")
+                    
+                    set.seed(1) # only in effect for this data generation because the seed is set again before the bootstrap 
+                    
                     sieve.y = predict(best.fit) + 
                         if (bootstrap.type=="sieve") {
                             surrogate.AR (resid(best.fit), order.max=order.max, nsurr=ci.bootstrap.size, wild=FALSE)$surr 
@@ -703,6 +716,7 @@ chngptm = function(formula.1, formula.2, family, data,
                         } else if (bootstrap.type=="awb") {
                             replicate(ci.bootstrap.size, awb(resid(best.fit), chngpt.var.sorted))
                         } else stop("wrong value for bootstrap.type: "%.%bootstrap.type)
+                        
                 }
             
                 # call a c function that implements bootstrap
@@ -715,40 +729,50 @@ chngptm = function(formula.1, formula.2, family, data,
                 boot.out$stype="i"
                 boot.out$fake=TRUE
                 
-                if(!stratified) {
-                    f.name=paste0(est.method, "_", family)
-                    if(verbose) cat(paste0("making call to ", f.name, "...\n"))
-                    boot.out$t = .Call(f.name
-                        , as.integer(imodel)
-                        , cbind(Z.sorted, chngpt.var.sorted, if(include.x) chngpt.var.sorted) #design matrix, the last column is to be used as (x-e)+ in the C program
-                        , as.double(y.sorted-o.sorted) # note that this way of handling offset only works for linear regression
-                        , as.double(w.sorted)
-                        , as.integer(attr(chngpts,"index"))
-                        , as.integer(verbose)
-                        , ci.bootstrap.size
-                        , n.sub # subsampling or m.out.of.n sample size
-                        , m.out.of.n>0 # with replacement
-                        , sieve.y
-                    )     
-                } else {
-                    f.name="twoD_"%.%family
-                    if(verbose) cat(paste0("making call to ", f.name, "...\n"))
-                    boot.out$t = .Call(f.name
-                        , cbind(Z.sorted, if(include.x) chngpt.var.sorted) # X
-                        , as.double(chngpt.var.sorted) # threshold variable
-                        , as.double(y.sorted-o.sorted) # note that this way of handling offset only works for linear regression 
-                        , as.double(w.sorted)
-                        , as.integer(stratified.by.sorted)
-    #                    as.integer(attr(chngpts[[1]],"index")), # potential thresholds 
-    #                    as.integer(attr(chngpts[[2]],"index")), # potential thresholds
-                        , as.double(lb.quantile)
-                        , as.double(ub.quantile)
-                        , ci.bootstrap.size # bootstrap size
-                        , as.integer(verbose)
-                    )
-                }
+                # give the bootstrap to multiple cores
+                # each core gets a seed to differentiate it from others
+                tmp=mclapply(1:ncpus, mc.cores = ncpus, FUN=function(seed) {     
+                    set.seed(seed)   
+                               
+                    if(!stratified) {
+                        f.name=paste0(est.method, "_", family)
+                        if(verbose) cat(paste0("making call to ", f.name, "...\n"))
+                        .Call(f.name
+                            , as.integer(imodel)
+                            , cbind(Z.sorted, chngpt.var.sorted, if(include.x) chngpt.var.sorted) #design matrix, the last column is to be used as (x-e)+ in the C program
+                            , as.double(y.sorted-o.sorted) # note that this way of handling offset only works for linear regression
+                            , as.double(w.sorted)
+                            , as.integer(attr(chngpts,"index"))
+                            , as.integer(verbose)
+                            , as.integer(ci.bootstrap.size/ncpus)
+                            , n.sub # subsampling or m.out.of.n sample size
+                            , m.out.of.n>0 # with replacement
+                            , sieve.y
+                        )     
+                    } else {
+                        f.name="twoD_"%.%family
+                        if(verbose) cat(paste0("making call to ", f.name, "...\n"))
+                        .Call(f.name
+                            , cbind(Z.sorted, if(include.x) chngpt.var.sorted) # X
+                            , as.double(chngpt.var.sorted) # threshold variable
+                            , as.double(y.sorted-o.sorted) # note that this way of handling offset only works for linear regression 
+                            , as.double(w.sorted)
+                            , as.integer(stratified.by.sorted)
+        #                    as.integer(attr(chngpts[[1]],"index")), # potential thresholds 
+        #                    as.integer(attr(chngpts[[2]],"index")), # potential thresholds
+                            , as.double(lb.quantile)
+                            , as.double(ub.quantile)
+                            , as.integer(ci.bootstrap.size/ncpus) # bootstrap size
+                            , as.integer(verbose)
+                        )
+                    }
+                    
+                }) # end mclapply
+                boot.out$t=do.call(cbind, tmp) # cbind b/c because tmp is a list of vectors
                 #str(boot.out$t); print(coef.hat); 
+        
                 tmp=t(matrix(boot.out$t, ncol=ci.bootstrap.size, dimnames=list(names(coef.hat), NULL)))                
+                
                 # for segmented, need to reparameterize b/c .C implements upperhinge based parameterization
                 if (threshold.type=="segmented") {
                     tmp[,1] = tmp[,1] - tmp[,ncol(tmp)-1] * tmp[,ncol(tmp)]
@@ -758,6 +782,9 @@ chngptm = function(formula.1, formula.2, family, data,
                 boot.out$t=tmp                                        
     
             } else {
+            # grid search
+                set.seed(1)     
+                
                 boot.out=boot::boot(data.sorted, R=ci.bootstrap.size, sim = "ordinary", stype = "i", parallel = ifelse(ncpus==1,"no","multicore"), ncpus=ncpus, statistic=function(dat, ii){
                     # this function is run R+1 times, the first time is the data itself without resampling
                     #print(ii); print(dat[sort(ii),c("z","x","y")])
@@ -2228,6 +2255,7 @@ convert.coef=function(coef.0, threshold.type) {
 threshold.func=function(threshold.type, coef, xx, x.name, include.intercept=FALSE) { 
   with(as.list(coef), switch(threshold.type 
   , segmented = ifelse(include.intercept,get("(Intercept)"),0) + xx*get(x.name) + get("("%.%x.name%.%"-chngpt)+")*(xx>chngpt)*(xx-chngpt) 
+  , M111      = ifelse(include.intercept,get("(Intercept)"),0) + xx*get(x.name) + get("("%.%x.name%.%"-chngpt2)-")*(xx<=chngpt.2)*(xx-chngpt.2) + get("("%.%x.name%.%"-chngpt1)-")*(xx<=chngpt.1)*(xx-chngpt.1) 
   , hinge     = ifelse(include.intercept,get("(Intercept)"),0) +                  get("("%.%x.name%.%"-chngpt)+")*(xx>chngpt)*(xx-chngpt) 
   , M02       = ifelse(include.intercept,get("(Intercept)"),0) +                  get("("%.%x.name%.%"-chngpt)+")*(xx>chngpt)*(xx-chngpt) + get("("%.%x.name%.%"-chngpt)+^2")*(xx>chngpt)*(xx-chngpt)^2 
   , M03       = ifelse(include.intercept,get("(Intercept)"),0) +                  get("("%.%x.name%.%"-chngpt)+")*(xx>chngpt)*(xx-chngpt) + get("("%.%x.name%.%"-chngpt)+^2")*(xx>chngpt)*(xx-chngpt)^2 + get("("%.%x.name%.%"-chngpt)+^3")*(xx>chngpt)*(xx-chngpt)^3 
@@ -2283,11 +2311,11 @@ predictx=function(fit, boot.ci.type=c("perc","basic","symm"), alpha=0.05, xx=NUL
     if (is.null(xx)) {
         xx=fit$best.fit$data[[fit$chngpt.var]]
         xx=seq(min(xx), max(xx), length=100)
+        xx=sort(c(xx, fit$chngpt))
     }
     
     yy=threshold.func(threshold.type, fit$coefficients, xx, fit$chngpt.var, include.intercept=include.intercept)
     yy.boot=apply(fit$vcov$boot.samples, 1, function(coef) threshold.func(threshold.type, coef, xx, fit$chngpt.var, include.intercept=include.intercept) )
-    
     get.pointwise.ci=function(yy, yy.boot, boot.ci.type, alpha) {
         if (boot.ci.type=="perc") {
             point.ci=apply(yy.boot, 1, function(x) quantile(x, c(alpha/2,1-alpha/2)))
