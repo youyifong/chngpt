@@ -6,3 +6,8 @@ src/M111.o
 src/M20.o
 src/M20c.o
 src/M22.o
+src/doublehinge.o
+src/M22c.o
+src/M30.o
+src/M33c.o
+src/Mstep.o

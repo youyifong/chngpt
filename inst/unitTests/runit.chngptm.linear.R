@@ -9,13 +9,7 @@ tolerance=1e-1
 # R.Version()$system is needed b/c 32 bit system gives different results from 64 bit system
 if((file.exists("D:/gDrive/3software/_checkReproducibility") | file.exists("~/_checkReproducibility")) & R.Version()$system %in% c("x86_64, mingw32","x86_64, linux-gnu")) tolerance=1e-6 
 print(paste0("tol: ", tolerance), quote=FALSE)
-
 verbose = 0
-
-
-## test mclapply support for fastgrid, cannot do it on windows
-#dat = sim.threephase(n = 20, seed=10)
-#fit.0=chngptm(y~z, ~x, type="M111", data=dat, family="gaussian", est.method="fastgrid", var.type="bootstrap", ci.bootstrap.size=3, verbose=1, ncpus=3); fit.0
 
 
 # autoregressive errors
@@ -28,6 +22,22 @@ fit=  chngptm(y~z, ~x, type="M20", data=dat, family="gaussian", est.method="fast
 checkEqualsNumeric(fit$vcov$boot.samples[1,], c(1.0655015,1.6554599,8.0428826,0.5240296,5.5494949), tolerance=tolerance)    
 fit=  chngptm(y~z, ~x, type="M20", data=dat, family="gaussian", est.method="fastgrid", var.type="bootstrap", ci.bootstrap.size=1, verbose=verbose, bootstrap.type="awb")
 checkEqualsNumeric(fit$vcov$boot.samples[1,], c(1.3466068,1.5963537,7.9991371,0.5712195,5.6141414), tolerance=tolerance)    
+
+
+print("########  segmented")
+type="segmented"    
+dat = sim.chngpt(mean.model="thresholded", threshold.type=type, n=200, seed=1, beta=c(2,2),       x.distr="lin", e.=5, family="gaussian", alpha=0, sd=3, coef.z=1)
+attr(dat,"coef")
+#plot(y~x, dat)
+fit = chngptm (formula.1=y~z, formula.2=~x, family="gaussian", dat,  type=type, est.method="fastgrid2", var.type="bootstrap", ci.bootstrap.size=2, verbose=verbose)
+if(verbose) plot(fit); fit
+checkEqualsNumeric(coef(fit), c(-0.6677877,0.8992538,2.2789307,1.9569163), tolerance=tolerance)    
+est=lincomb(fit, comb=c(0,0,1,1), alpha=0.05); print(est)
+
+
+## test mclapply support for fastgrid, cannot do it on windows
+#dat = sim.threephase(n = 20, seed=10)
+#fit.0=chngptm(y~z, ~x, type="M111", data=dat, family="gaussian", est.method="fastgrid", var.type="bootstrap", ci.bootstrap.size=3, verbose=1, ncpus=3); fit.0
 
 
 # M111
@@ -56,19 +66,6 @@ plot(fit)
 
 # also works for M20
 #fit = chngptm (formula.1=y~z+(1|id), formula.2=~x, family="gaussian", dat, type="M20", est.method="grid", var.type="bootstrap", ci.bootstrap.size=1)
-
-
-print("########  segmented")
-type="segmented"    
-dat = sim.chngpt(mean.model="thresholded", threshold.type=type, n=200, seed=1, beta=c(2,2),       x.distr="lin", e.=5, family="gaussian", alpha=0, sd=3, coef.z=1)
-attr(dat,"coef")
-plot(y~x, dat)
-fit = chngptm (formula.1=y~z, formula.2=~x, family="gaussian", dat,  type=type, est.method="fastgrid2", var.type="bootstrap", ci.bootstrap.size=100, verbose=verbose)
-if(verbose) plot(fit); fit
-checkEqualsNumeric(coef(fit), c(-0.6677877,0.8992538,2.2789307,1.9569163), tolerance=tolerance)    
-est=lincomb(fit, comb=c(0,0,1,1), alpha=0.05); print(est)
-
-
 
 
 print("########  M12c")
