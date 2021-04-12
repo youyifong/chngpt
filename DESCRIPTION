@@ -1,8 +1,8 @@
 Package: chngpt
 LazyLoad: yes
 LazyData: yes
-Date: 2021.4-7
-Version: 2021.4-7
+Date: 2021.4-11
+Version: 2021.4-11
 Title: Estimation and Hypothesis Testing for Threshold Regression
 Authors@R: c(person("Youyi", "Fong", role = "cre", email = "youyifong@gmail.com"),
     person("Qianqian", "Chen", role = "aut", email = "qc25@uw.edu"),
