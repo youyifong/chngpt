@@ -35,10 +35,10 @@ lincomb=c(model.matrix(f, X) %*% c(0,1,0,0,1,1))
 y=rbern(n,expit(lincomb))
 dat=data.frame(y,X)
 # use a binomial to test
-fit=chngptm(formula.1=y~X2+X3, formula.2=~X2*X1+X3*X1, dat, type="step", family="binomial", grid.search.max=5, var.type="none")
+fit=chngptm(formula.1=y~X2+X3, formula.2=~X2*X1+X3*X1, dat, type="step", family="binomial", grid.search.max=5, var.type="none", verbose=2)
 # (Intercept)              X2              X3    I(X1>chngpt) X2:I(X1>chngpt) X3:I(X1>chngpt)          chngpt 
 #checkEqualsNumeric(c(coef(fit),fit$chngpt), c(0.20860034,-0.02784660,-0.08843246,0.65396890,1.02101488,1.24566539,0.02800216), tolerance=tolerance)# before 10/15/2019
-checkEqualsNumeric(c(coef(fit),fit$chngpt), c(0.20427431,-0.02485192,-0.08683151,0.66217010,1.01376498,1.24094842,0.02800216), tolerance=tolerance) # on 10/15/2019
+checkEqualsNumeric(c(coef(fit),fit$chngpt), c(0.18205886,-0.02300560,-0.11624135,0.64995016,0.95123073,1.22953518,-0.03592242), tolerance=tolerance) # on 10/15/2019
 
 
 

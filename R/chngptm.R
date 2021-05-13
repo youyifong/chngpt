@@ -34,7 +34,6 @@ chngptm = function(formula.1, formula.2, family, data,
     est.method<-match.arg(est.method)    
     bootstrap.type<-match.arg(bootstrap.type)    
     
-    library(RhpcBLASctl)
     # without this, code may hang when ncpus>1
     blas_get_num_procs()
     blas_set_num_threads(1)
@@ -530,7 +529,6 @@ chngptm = function(formula.1, formula.2, family, data,
     
     
     
-    # find e.final
     if (verbose>=2) cat("find e.final\n")
     if (est.method %in% c("grid","gridC","fastgrid","fastgrid2")) {
     #### grid search
@@ -2302,7 +2300,7 @@ predict.chngptm=function (object, newdata = NULL, type = c("link", "response", "
 
 
 
-predictx=function(fit, boot.ci.type=c("perc","basic","symm"), alpha=0.05, xx=NULL, verbose=FALSE, return.boot=FALSE, include.intercept=FALSE) {
+predictx=function(fit, boot.ci.type=c("perc","basic","symm"), alpha=0.05, xx=NULL, verbose=FALSE, return.boot=FALSE, include.intercept=FALSE, get.simultaneous=TRUE) {
     
     boot.ci.type<-match.arg(boot.ci.type)  
     
@@ -2315,6 +2313,9 @@ predictx=function(fit, boot.ci.type=c("perc","basic","symm"), alpha=0.05, xx=NUL
     }
     
     yy=threshold.func(threshold.type, fit$coefficients, xx, fit$chngpt.var, include.intercept=include.intercept)
+    
+    if (is.null(fit$vcov$boot.samples)) return (list(xx=xx, yy=yy)    )
+    
     yy.boot=apply(fit$vcov$boot.samples, 1, function(coef) threshold.func(threshold.type, coef, xx, fit$chngpt.var, include.intercept=include.intercept) )
     get.pointwise.ci=function(yy, yy.boot, boot.ci.type, alpha) {
         if (boot.ci.type=="perc") {
@@ -2333,31 +2334,33 @@ predictx=function(fit, boot.ci.type=c("perc","basic","symm"), alpha=0.05, xx=NUL
     out = list(xx=xx, yy=yy, point.ci=point.ci, simul.ci=NULL)    
         
     # get simultaneous CI
-    alpha.cpy=alpha
-    while(TRUE) {
-        # compute simultaneous coverage
-        simul.cvg=mean(sapply (1:ncol(yy.boot), function(j) {
-            all(yy.boot[,j] >= point.ci[1,] & yy.boot[,j] <= point.ci[2,])
-        }))
-        if (verbose) {
-            point.cvg=rowMeans(sapply (1:ncol(yy.boot), function(j) {
-                yy.boot[,j] >= point.ci[1,] & yy.boot[,j] <= point.ci[2,]
-            }))        
-            myprint(alpha, mean(point.cvg), simul.cvg)
+    if (get.simultaneous) {
+        alpha.cpy=alpha
+        while(TRUE) {
+            # compute simultaneous coverage
+            simul.cvg=mean(sapply (1:ncol(yy.boot), function(j) {
+                all(yy.boot[,j] >= point.ci[1,] & yy.boot[,j] <= point.ci[2,])
+            }))
+            if (verbose) {
+                point.cvg=rowMeans(sapply (1:ncol(yy.boot), function(j) {
+                    yy.boot[,j] >= point.ci[1,] & yy.boot[,j] <= point.ci[2,]
+                }))        
+                myprint(alpha, mean(point.cvg), simul.cvg)
+            }
+            
+            if (round(simul.cvg,2)<1-alpha.cpy) {
+                alpha=alpha-0.001
+                if(abs(alpha)<1e-6) break
+                point.ci=get.pointwise.ci(yy, yy.boot, boot.ci.type, alpha)
+            } else {
+                break
+            }
         }
-        
-        if (round(simul.cvg,2)<1-alpha.cpy) {
-            alpha=alpha-0.001
-            if(abs(alpha)<1e-6) break
-            point.ci=get.pointwise.ci(yy, yy.boot, boot.ci.type, alpha)
+        if (abs(alpha)<1e-6) {
+            warning("no simultaneous CI found")
         } else {
-            break
+            out$simul.ci=point.ci
         }
-    }
-    if (abs(alpha)<1e-6) {
-        warning("no simultaneous CI found")
-    } else {
-        out$simul.ci=point.ci
     }
     
     if(return.boot) out$boot=yy.boot

@@ -33,7 +33,7 @@ chngptm (formula.1, formula.2, family, data, type = c("hinge",
  c("default", "fastgrid2", "fastgrid", "grid",
  "smoothapprox"), var.type = c("default", "none",
  "robust", "model", "bootstrap", "all"), aux.fit =
- NULL, lb.quantile = 0.1, ub.quantile = 0.9,
+ NULL, lb.quantile = 0.05, ub.quantile = 0.95,
  grid.search.max = Inf, test.inv.ci = TRUE,
  boot.test.inv.ci = FALSE, bootstrap.type =
  c("nonparametric", "wild", "sieve", "wildsieve",
@@ -56,7 +56,7 @@ chngptm.xy(x, y, type=c("step","hinge","segmented","segmented2","stegmented"),
  lty = 1, add = FALSE, add.points = TRUE, add.ci =
  TRUE, breaks = 20, mark.chngpt = TRUE, xlab = NULL,
  ylab = NULL, plot.individual.line = FALSE, main = "",
- y.adj=NULL, auto.adj.y=FALSE, 
+ y.adj = NULL, auto.adj.y = FALSE, transform = NULL,
  ...) 
 \method{summary}{chngptm} (object, var.type = NULL, expo = FALSE,
  show.slope.post.threshold = FALSE, verbose = FALSE,
@@ -76,7 +76,8 @@ lincomb(object, comb, alpha = 0.05, boot.type = "perc")
   \item{formula.strat}{stratification formula}
   \item{family}{string. coxph or any valid argument that can be passed to glm. But variance estimate is only available for binomial and gaussian (only model-based for latter)}
   \item{data}{data frame.}
-  \item{type}{}
+  \item{type}{type}
+  \item{transform}{transform}
   \item{b.transition}{Numeric. Controls whether threshold model or smooth transition model. Default to Inf, which correponds to threshold model}
   \item{est.method}{default: estimation algorithm will be chosen optimally; fastgrid2: a super fast grid search algorithm, limited to linear regression; grid: plain grid search, works for almost all models; smoothapprox: approximates the likelihood function using a smooth function, only works for some models. fastgrid = fastgrid2, kept for backward compatibility}
   \item{var.type}{string. Different methods for estimating covariance matrix and constructing confidence intervals}
@@ -103,7 +104,7 @@ lincomb(object, comb, alpha = 0.05, boot.type = "perc")
   \item{show.slope.post.threshold}{boolean}
 
   \item{x}{chngptm fit object.}
-  \item{newdata}{}
+  \item{newdata}{newdata}
   \item{object}{chngptm fit object.}
   \item{\dots}{arguments passed to glm or coxph}
   \item{m.out.of.n}{sample size for m-out-of-n bootstrap, default 0 for not doing this type of bootstrap}
@@ -112,8 +113,8 @@ lincomb(object, comb, alpha = 0.05, boot.type = "perc")
   \item{boot.test.inv.ci}{whether to get test inversion CI under bootstrap}
   \item{search.bound}{bounds for search for sloping parameters}
   \item{which}{an integer}
-  \item{y.adj}{}
-  \item{auto.adj.y}{}
+  \item{y.adj}{y.adj}
+  \item{auto.adj.y}{auto.adj.y}
   \item{xlim}{xlim}
   \item{lwd}{lwd}
   \item{lcol}{line col}

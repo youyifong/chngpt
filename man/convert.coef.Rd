@@ -12,8 +12,10 @@ Some helper functions. predictx returns confidence bands for predictions as func
 
 convert.coef(coef.0, threshold.type)
 
-predictx(fit, boot.ci.type, alpha = 0.05, xx = NULL, verbose =
-         FALSE, return.boot = FALSE, include.intercept=FALSE)
+predictx(fit, boot.ci.type = c("perc", "basic", "symm"), alpha
+ = 0.05, xx = NULL, verbose = FALSE, return.boot =
+ FALSE, include.intercept = FALSE, get.simultaneous =
+ TRUE)
          
 threshold.func(threshold.type, coef, xx, x.name, include.intercept=FALSE)
 }
@@ -27,6 +29,9 @@ threshold.func(threshold.type, coef, xx, x.name, include.intercept=FALSE)
 %%     ~~Describe \code{coef.0} here~~
 }
   \item{threshold.type}{
+%%     ~~Describe \code{threshold.type} here~~
+}
+  \item{get.simultaneous}{
 %%     ~~Describe \code{threshold.type} here~~
 }
   \item{return.boot}{
