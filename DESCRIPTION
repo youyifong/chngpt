@@ -12,6 +12,8 @@ Authors@R: c(person("Youyi", "Fong", role = "cre", email = "youyifong@gmail.com"
     person("Zonglin", "He", role = "aut", email = "nkhezl@gmail.com"), 
     person("Simone", "Giannerini", role = "aut", email = "simone.giannerini@unibo.it")
     )
+Author: Youyi Fong [aut, cre]
+Maintainer: Youyi Fong <youyifong@gmail.com>
 Depends: R (>= 3.6)
 Suggests: R.rsp, RUnit, mvtnorm
 Imports: survival, splines, kyotil (>= 2020.10-12), boot, MASS, methods, lme4, parallel, RhpcBLASctl
