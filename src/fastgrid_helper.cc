@@ -118,7 +118,7 @@ Matrix<> qr_solve (const Matrix<>& A, const Matrix<>& b)
     delete[] work;
 
     Matrix<> result(A.cols(), b.cols(), false);
-    for (uint i = 0; i < cols; ++i)
+    for (int i = 0; i < cols; ++i)
       result(i, _) = bb(i, _);
 
 //    for (unsigned int i=0; i<pivot.size(); i++) PRINTF("%u ", pivot(i)); PRINTF("\n");       

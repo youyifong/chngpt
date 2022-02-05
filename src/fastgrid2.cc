@@ -405,9 +405,9 @@ SEXP fastgrid2_gaussian(
             }            
             
 
-            Matrix <> beta_hat = qr_solve (Xbreg, Yb);
+//            Matrix <> beta_hat = qr_solve (Xbreg, Yb);
 //            PRINTF("qr_solve \n"); for (i=0; i<p+1; i++) PRINTF("%f ", beta_hat(i)); PRINTF("\n");
-//            Matrix <> beta_hat = invpd(crossprod(Xbreg)) * (t(Xbreg) * Yb);
+            Matrix <> beta_hat = invpd(crossprod(Xbreg)) * (t(Xbreg) * Yb);
 //            PRINTF("invpd \n"); for (i=0; i<p+1; i++) PRINTF("%f ", beta_hat(i)); PRINTF("\n");
             if(model==111) {
                 for (int j=0; j<p_coef-ncut; j++) coef[b*p_coef+j]=beta_hat[j];                         
@@ -513,8 +513,8 @@ SEXP fastgrid2_gaussian(
             }
             
             
-            Matrix <> beta_hat = qr_solve (Xbreg, Yb);
-            //Matrix <> beta_hat = invpd(crossprod(Xbreg)) * (t(Xbreg) * Yb);
+            //Matrix <> beta_hat = qr_solve (Xbreg, Yb);
+            Matrix <> beta_hat = invpd(crossprod(Xbreg)) * (t(Xbreg) * Yb);
             for (int j=0; j<p_coef-1; j++) coef[b*p_coef+j]=beta_hat[j];                         
             coef[(b+1)*p_coef-1] = e_hat;
             
