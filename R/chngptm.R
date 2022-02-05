@@ -1643,7 +1643,7 @@ logLik.chngptm=function(object,...) {
 }
 
 # which=1: scatterplot with fitted line, only works for simple regression
-plot.chngptm=function(x, which=NULL, xlim=NULL, lwd=2, lcol="red", lty=1, add=FALSE, add.points=TRUE, add.ci=TRUE, breaks=20, mark.chngpt=TRUE, xlab=NULL, ylab=NULL, 
+plot.chngptm=function(x, which=NULL, xlim=NULL, ylim=NULL, lwd=2, lcol="red", lty=1, add=FALSE, add.points=TRUE, add.ci=TRUE, breaks=20, mark.chngpt=TRUE, xlab=NULL, ylab=NULL, 
     plot.individual.line=FALSE, main="", y.adj=NULL, auto.adj.y=FALSE, transform=NULL, ...) {
     
     has.boot.samples=FALSE
@@ -1776,8 +1776,9 @@ plot.chngptm=function(x, which=NULL, xlim=NULL, lwd=2, lcol="red", lty=1, add=FA
         
             } # end twophase
         }# end for intercept
-    
-        if(!add) plot(data[[fit$chngpt.var]], y, xlim=xlim, xlab=ifelse(is.null(xlab),fit$chngpt.var,xlab), ylab=ifelse(is.null(ylab),yname,ylab), type="n", main=main, ..., ylim=range(out[[1]][,2], if(add.points) y))
+        
+        if (is.null(ylim)) ylim=range(out[[1]][,2], if(add.points) y)
+        if(!add) plot(data[[fit$chngpt.var]], y, xlim=xlim, xlab=ifelse(is.null(xlab),fit$chngpt.var,xlab), ylab=ifelse(is.null(ylab),yname,ylab), type="n", main=main, ..., ylim=ylim)
         if(add.points) points(data[[fit$chngpt.var]], y, ...)
         lines(out[[1]][,1], out[[1]][,2], lwd=lwd, col=lcol, lty=lty)
         #if(mark.chngpt) points(chngpt.est, yy[1], pch=19, col=lcol, cex=1.5)
