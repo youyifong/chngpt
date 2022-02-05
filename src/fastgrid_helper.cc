@@ -227,7 +227,7 @@ Matrix<> myqr_getQ (const Matrix<>& A)
 {
     // Set up working variables
     double* QRarray = A.getArray(); // input/output array pointer
-    int rows = (int) A.rows();
+    unsigned long rows = (int) A.rows();
     int cols = (int) A.cols();
     Matrix<> tau = Matrix<>(rows < cols ? rows : cols, 1);
     double* tarray = tau.getArray(); // tau output array pointer
