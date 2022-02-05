@@ -227,7 +227,7 @@ Matrix<> myqr_getQ (const Matrix<>& A)
 {
     // Set up working variables
     double* QRarray = A.getArray(); // input/output array pointer
-    unsigned long rows = (int) A.rows();
+    int rows = (int) A.rows();
     int cols = (int) A.cols();
     Matrix<> tau = Matrix<>(rows < cols ? rows : cols, 1);
     double* tarray = tau.getArray(); // tau output array pointer
@@ -357,24 +357,25 @@ Eigen eigen (const Matrix<>& A, bool vectors=true)
 // H = Q_1 * Q_1' (https://stats.stackexchange.com/questions/139969/speeding-up-hat-matrices-like-xxx-1x-projection-matrices-and-other-as)
 void _preprocess(Matrix<double, Row>& Z, Matrix<double, Row>& Y) {
      
-    // if there are too many rows, this fails for reason
-    // compute Q
-    Matrix<> Q = myqr_getQ (Z);       
-    // assign Q to Z
-    int p=Z.cols(); unsigned long n=Z.rows(); for (unsigned long i=0; i<n; i++) for (int j=0; j<p; j++) Z(i,j) = Q(i,j);
-    // compute resid
-    Y = Y - tcrossprod1(Q) * Y; 
-//    PRINTF("Z r\n"); for (int i=0; i<n; i++) {for (int j=0; j<p; j++)  PRINTF("%f ", Q(i,j));   PRINTF("%f ", Y(i,0));   PRINTF("\n");}                
+//    // if there are too many rows, this fails, probably due to the use of int myqr_getQ, which is necessary b/c 
+//    // F77_NAME(dgeqrf)(const int* m, const int* n, double* a, const int* lda,
+//    // compute Q
+//    Matrix<> Q = myqr_getQ (Z);       
+//    // assign Q to Z
+//    int p=Z.cols(); unsigned long n=Z.rows(); for (unsigned long i=0; i<n; i++) for (int j=0; j<p; j++) Z(i,j) = Q(i,j);
+//    // compute resid
+//    Y = Y - tcrossprod1(Q) * Y; 
+////    PRINTF("Z r\n"); for (int i=0; i<n; i++) {for (int j=0; j<p; j++)  PRINTF("%f ", Q(i,j));   PRINTF("%f ", Y(i,0));   PRINTF("\n");}                
      
-//     // the old implementation based on inverting X'X
-//    int p=Z.cols();
-//    Matrix<> A = invpd(crossprod(Z));
-//    Eigen Aeig = eigen(A);
-//    Matrix <double,Row,Concrete> A_eig (p, p, true, 0);
-//    for (int j=0; j<p; j++) A_eig(j,j)=sqrt(Aeig.values(j));
-//    Y = Y - Z * A * (t(Z) * Y);                       // save r in Y
-//    Z = Z * (Aeig.vectors * A_eig * t(Aeig.vectors)); // save B in Z    
-////    PRINTF("Z r\n"); for (int i=0; i<Z.rows(); i++) {for (int j=0; j<p; j++) PRINTF("%f ", Z(i,j));   PRINTF("%f ", Y(i,0)); PRINTF("\n");}            
+     // the old implementation based on inverting X'X
+    int p=Z.cols();
+    Matrix<> A = invpd(crossprod(Z));
+    Eigen Aeig = eigen(A);
+    Matrix <double,Row,Concrete> A_eig (p, p, true, 0);
+    for (int j=0; j<p; j++) A_eig(j,j)=sqrt(Aeig.values(j));
+    Y = Y - Z * A * (t(Z) * Y);                       // save r in Y
+    Z = Z * (Aeig.vectors * A_eig * t(Aeig.vectors)); // save B in Z    
+//    PRINTF("Z r\n"); for (int i=0; i<Z.rows(); i++) {for (int j=0; j<p; j++) PRINTF("%f ", Z(i,j));   PRINTF("%f ", Y(i,0)); PRINTF("\n");}            
 
 }
 
