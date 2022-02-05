@@ -276,23 +276,23 @@ Matrix<> myqr_getQ (const Matrix<>& A)
 // H = Q_1 * Q_1' (https://stats.stackexchange.com/questions/139969/speeding-up-hat-matrices-like-xxx-1x-projection-matrices-and-other-as)
 void _preprocess(Matrix<double, Row>& Z, Matrix<double, Row>& Y) {
      
-    // compute Q
-    Matrix<> Q = myqr_getQ (Z);       
-    // assign Q to Z
-    int p=Z.cols(), n=Z.rows(); for (int i=0; i<n; i++) for (int j=0; j<p; j++) Z(i,j) = Q(i,j);
-    // compute resid
-    Y = Y - tcrossprod1(Q) * Y; 
-//    PRINTF("Z r\n"); for (int i=0; i<n; i++) {for (int j=0; j<p; j++)  PRINTF("%f ", Q(i,j));   PRINTF("%f ", Y(i,0));   PRINTF("\n");}                
+//    // compute Q
+//    Matrix<> Q = myqr_getQ (Z);       
+//    // assign Q to Z
+//    int p=Z.cols(), n=Z.rows(); for (int i=0; i<n; i++) for (int j=0; j<p; j++) Z(i,j) = Q(i,j);
+//    // compute resid
+//    Y = Y - tcrossprod1(Q) * Y; 
+////    PRINTF("Z r\n"); for (int i=0; i<n; i++) {for (int j=0; j<p; j++)  PRINTF("%f ", Q(i,j));   PRINTF("%f ", Y(i,0));   PRINTF("\n");}                
      
      // the old implementation based on inverting X'X
-//    int p=Z.cols();
-//    Matrix<> A = invpd(crossprod(Z));
-//    Eigen Aeig = eigen(A);
-//    Matrix <double,Row,Concrete> A_eig (p, p, true, 0);
-//    for (int j=0; j<p; j++) A_eig(j,j)=sqrt(Aeig.values(j));
-//    Y = Y - Z * A * (t(Z) * Y);                       // save r in Y
-//    Z = Z * (Aeig.vectors * A_eig * t(Aeig.vectors)); // save B in Z    
-////    PRINTF("Z r\n"); for (int i=0; i<Z.rows(); i++) {for (int j=0; j<p; j++) PRINTF("%f ", Z(i,j));   PRINTF("%f ", Y(i,0)); PRINTF("\n");}            
+    int p=Z.cols();
+    Matrix<> A = invpd(crossprod(Z));
+    Eigen Aeig = eigen(A);
+    Matrix <double,Row,Concrete> A_eig (p, p, true, 0);
+    for (int j=0; j<p; j++) A_eig(j,j)=sqrt(Aeig.values(j));
+    Y = Y - Z * A * (t(Z) * Y);                       // save r in Y
+    Z = Z * (Aeig.vectors * A_eig * t(Aeig.vectors)); // save B in Z    
+//    PRINTF("Z r\n"); for (int i=0; i<Z.rows(); i++) {for (int j=0; j<p; j++) PRINTF("%f ", Z(i,j));   PRINTF("%f ", Y(i,0)); PRINTF("\n");}            
 
 }
 
