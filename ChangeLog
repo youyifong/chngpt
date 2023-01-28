@@ -365,3 +365,6 @@
 2022-4-6
     * Takes care of blas issues related to FCONE
 
+2022-1-28
+    * replace bind1st with bind
+
