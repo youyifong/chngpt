@@ -66,7 +66,7 @@ SEXP fastgrid2_gaussian(
     double* X_dat = REAL(u_X);
     double* Y_dat=REAL(u_Y); 
     double* W_dat=REAL(u_W);  
-    bool sieveBoot = !isNull(u_sieveY);
+    bool sieveBoot = !Rf_isNull(u_sieveY);
     double* sieveY_dat; 
     if (sieveBoot) sieveY_dat=REAL(u_sieveY); else sieveY_dat=Y_dat; // the latter is just to get rid of no-initialization warning
     
