@@ -13,3 +13,4 @@ src/M33c.o
 src/Mstep.o
 src/.fastgrid_helper.cc.swp
 *.o
+R/.Rhistory

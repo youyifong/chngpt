@@ -36,13 +36,11 @@ chngptm = function(formula.1, formula.2, family, data,
     
     # disable lower level parallelization in favor of higher level of parallelization
     # without this, code may hang when ncpus>1
-    library(RhpcBLASctl)
-    blas_get_num_procs()
-    blas_set_num_threads(1L)
+    RhpcBLASctl::blas_get_num_procs()
+    RhpcBLASctl::blas_set_num_threads(1L)
     #stopifnot(blas_get_num_procs() == 1L) # Commented this out as it does not work as expected any more!
-    omp_set_num_threads(1L)
-    stopifnot(omp_get_max_threads() == 1L)
-    
+    RhpcBLASctl::omp_set_num_threads(1L)
+
     
     if (var.type=="bootstrap" & ci.bootstrap.size %% ncpus != 0) stop("ci.bootstrap.size needs to be a multiple of ncpus")
     
