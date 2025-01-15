@@ -625,11 +625,11 @@ chngptm = function(formula.1, formula.2, family, data,
                 if (verbose>1) cat(coef.tmp, "\n")
                 if (max(abs(coef.tmp - coef.hat)) < tol) {
                     coef.hat = coef.tmp
-                    e.final=last(coef.hat)
+                    e.final=mylast(coef.hat)
                     break
                 } else {
                     coef.hat = coef.tmp
-                    e.final=last(coef.hat)
+                    e.final=mylast(coef.hat)
                 }
                 
             } # end while 
@@ -1090,9 +1090,9 @@ chngptm = function(formula.1, formula.2, family, data,
             
             # profile likelihood ratio test inversion CI
             if(test.inv.ci) {
-                scale.chisq= last(diag(var.est))/(-last(diag(V.inv))/n) 
+                scale.chisq= mylast(diag(var.est))/(-mylast(diag(V.inv))/n) 
                 if (verbose>=2) {
-                    myprint(last(diag(var.est)), -last(diag(V.inv))/n, scale.chisq)
+                    myprint(mylast(diag(var.est)), -mylast(diag(V.inv))/n, scale.chisq)
                 }
                 if (scale.chisq<0) {
                     cat("scale.chisq is negative\n")
@@ -1391,8 +1391,8 @@ get.chngpts=function (chngpt.var.sorted, lb.quantile, ub.quantile, n.chngpts, st
         if(chngpts[1]==chngpt.var.sorted[1]) {
             chngpts=chngpts[chngpts!=chngpt.var.sorted[1]]
         } 
-        if (chngpts[length(chngpts)]==last(chngpt.var.sorted)) {
-            chngpts=chngpts[chngpts!=last(chngpt.var.sorted)]
+        if (chngpts[length(chngpts)]==mylast(chngpt.var.sorted)) {
+            chngpts=chngpts[chngpts!=mylast(chngpt.var.sorted)]
         }
     }
     
@@ -1709,7 +1709,7 @@ plot.chngptm=function(x, which=NULL, xlim=NULL, ylim=NULL, lwd=2, lcol="red", lt
                 
                 # may need to adjust y if there are other covariates
                 if(auto.adj.y) {
-                    y.adj=median(y)-last(yy)
+                    y.adj=median(y)-mylast(yy)
                 } else if(is.null(y.adj)) y.adj=0
                 
                 yy=yy+y.adj
@@ -1761,7 +1761,7 @@ plot.chngptm=function(x, which=NULL, xlim=NULL, ylim=NULL, lwd=2, lcol="red", lt
                 
                 # may need to adjust y if there are other covariates
                 if(auto.adj.y) {
-                    y.adj=median(y)-last(yy)
+                    y.adj=median(y)-mylast(yy)
                 } else if(is.null(y.adj)) y.adj=0
                 
                 yy=yy+y.adj

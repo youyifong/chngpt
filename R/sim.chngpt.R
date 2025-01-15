@@ -333,7 +333,7 @@ sim.twophase.ran.inte=function(threshold.type, n, seed) {
     tmp = sim.chngpt(mean.model="thresholded", threshold.type=threshold.type, n=n, seed=seed, beta=c(2,2), x.distr="lin", e.=5, family="gaussian", alpha=0, sd=3, coef.z=1)    
     g=16 # number of clusters
     w=rnorm(g,sd=10)
-    w=c(rep(w, each=floor(n/g)), rep(last(w), n-g*floor(n/g)))
+    w=c(rep(w, each=floor(n/g)), rep(mylast(w), n-g*floor(n/g)))
     id=c(rep(1:g, each=floor(n/g)), rep(g, n-g*floor(n/g)))
     scramble=sample(n)
     dat = cbind(tmp, w=w[scramble], id=id[scramble])
